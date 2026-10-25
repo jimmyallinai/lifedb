@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/
+# 个人数据与会话：永远不进仓
+raw/
+out/
+creds/
+*.cookies.json
+*.session
+token.txt
+.lifedb/

@@ -1,0 +1,49 @@
+"""新 importer 的测试模板：复制到 tests/test_<platform>.py，改名与计数期望。
+
+最低要求三件（缺一不可，参考 tests/test_generic_file.py 的写法）：
+1. 对账：report["ok"] 为真，且 units / items_seen / items_skipped /
+   records_written 与 fixture 的人工计数一致；
+2. 幂等：同 fixture 跑两遍，输出分片字节完全一致；
+3. 字段：抽查关键记录的 role / conversation_id / platform 正确。
+fixture 只能用全合成假数据（见 fixtures/example.json 的注记）。
+"""
+
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from lifedb_importers.core import pipeline, registry  # noqa: E402
+
+FIXTURE = Path(__file__).resolve().parent / "fixtures" / "<platform>" / "<fixture-file>"
+IMPORTER_NAME = "<importer-name>"  # TODO: 与 registry 里的 name 一致
+
+
+class TemplateImporterTest(unittest.TestCase):
+    def test_reconcile_counts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            importer = registry.get(IMPORTER_NAME)
+            report = pipeline.run_import(importer, source=str(FIXTURE),
+                                         out_root=Path(tmp))
+            self.assertTrue(report["ok"], report)
+            self.assertEqual(report["source_units"], 0)    # TODO: fixture 顶层单元数
+            self.assertEqual(report["items_seen"], 0)      # TODO: 看到的条目总数
+            self.assertEqual(report["items_skipped"], 0)   # TODO: 跳过数（空正文等）
+            self.assertEqual(report["records_written"], 0)  # TODO: = seen - skipped
+
+    def test_idempotent_rerun(self):
+        outputs = []
+        for _ in range(2):
+            with tempfile.TemporaryDirectory() as tmp:
+                importer = registry.get(IMPORTER_NAME)
+                pipeline.run_import(importer, source=str(FIXTURE), out_root=Path(tmp))
+                outputs.append(b"".join(
+                    shard.read_bytes()
+                    for shard in sorted((Path(tmp) / "data").rglob("*.jsonl"))))
+        self.assertEqual(outputs[0], outputs[1])
+
+
+if __name__ == "__main__":
+    unittest.main()

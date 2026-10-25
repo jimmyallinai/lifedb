@@ -1,0 +1,2 @@
+{"id": "d-conv-1", "title": "豆包示例一", "created": "1735689600", "coverage": "SAMPLE", "messages": [{"role": "user", "text": "豆包你好", "time": "1735689600", "message_id": "dm-1"}, {"role": "assistant", "text": "你好呀", "time": 1735689660, "message_id": "dm-2"}, {"role": "assistant", "text": "", "time": 1735689720, "message_id": "dm-3"}]}
+{"id": "d-conv-2", "title": "豆包示例二", "created": "2026-02-01T10:00:00+08:00", "messages": [{"role": "unknown", "text": "一条未知角色的消息", "time": "2026-02-01T10:00:00+08:00"}]}

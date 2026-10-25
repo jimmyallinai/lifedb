@@ -1,0 +1,265 @@
+[
+ {
+  "id": "conv-a",
+  "title": "示例对话 A",
+  "create_time": 1767225600,
+  "current_node": "n-a2",
+  "mapping": {
+   "root-a": {
+    "message": null,
+    "parent": null,
+    "children": [
+     "n-sys"
+    ]
+   },
+   "n-sys": {
+    "message": {
+     "id": "m-sys",
+     "author": {
+      "role": "system"
+     },
+     "create_time": 1767225600,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "系统提示"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "root-a",
+    "children": [
+     "n-u1"
+    ]
+   },
+   "n-u1": {
+    "message": {
+     "id": "m-u1",
+     "author": {
+      "role": "user"
+     },
+     "create_time": 1767225600,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "你好，帮我算 1+1"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-sys",
+    "children": [
+     "n-a1"
+    ]
+   },
+   "n-a1": {
+    "message": {
+     "id": "m-a1",
+     "author": {
+      "role": "assistant"
+     },
+     "create_time": 1767225660,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "你好！1+1 等于 2。"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-u1",
+    "children": [
+     "n-u2"
+    ]
+   },
+   "n-u2": {
+    "message": {
+     "id": "m-u2",
+     "author": {
+      "role": "user"
+     },
+     "create_time": 1767225720,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "再讲个笑话"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-a1",
+    "children": [
+     "n-a2",
+     "n-a2alt"
+    ]
+   },
+   "n-a2": {
+    "message": {
+     "id": "m-a2",
+     "author": {
+      "role": "assistant"
+     },
+     "create_time": 1767225780,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "笑话一则（主线版本）。"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-u2",
+    "children": [
+     "n-think"
+    ]
+   },
+   "n-a2alt": {
+    "message": {
+     "id": "m-a2alt",
+     "author": {
+      "role": "assistant"
+     },
+     "create_time": 1767225780,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "笑话一则（重生成版本）。"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-u2",
+    "children": []
+   },
+   "n-think": {
+    "message": {
+     "id": "m-think",
+     "author": {
+      "role": "assistant"
+     },
+     "create_time": 1767225840,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "内部思考，不外显"
+      ]
+     },
+     "recipient": "all",
+     "channel": "analysis"
+    },
+    "parent": "n-a2",
+    "children": []
+   }
+  }
+ },
+ {
+  "id": "conv-b",
+  "title": "示例对话 B",
+  "create_time": 1767139200,
+  "current_node": "n-ba1",
+  "mapping": {
+   "root-b": {
+    "message": null,
+    "parent": null,
+    "children": [
+     "n-bu1"
+    ]
+   },
+   "n-bu1": {
+    "message": {
+     "id": "m-bu1",
+     "author": {
+      "role": "user"
+     },
+     "create_time": 1767139200,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "跨年夜有什么安排？"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "root-b",
+    "children": [
+     "n-ba1"
+    ]
+   },
+   "n-ba1": {
+    "message": {
+     "id": "m-ba1",
+     "author": {
+      "role": "assistant"
+     },
+     "create_time": 1767139260,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "可以在家看晚会。"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-bu1",
+    "children": []
+   }
+  }
+ },
+ {
+  "id": "conv-c",
+  "title": null,
+  "create_time": 1767225600,
+  "current_node": "n-cu1",
+  "mapping": {
+   "root-c": {
+    "message": null,
+    "parent": null,
+    "children": [
+     "n-cu1"
+    ]
+   },
+   "n-cu1": {
+    "message": {
+     "id": "m-cu1",
+     "author": {
+      "role": "user"
+     },
+     "create_time": 1767225600,
+     "content": {
+      "content_type": "multimodal_text",
+      "parts": [
+       {
+        "content_type": "image_asset_pointer",
+        "asset_pointer": "file-service://example"
+       },
+       "这张图里是什么？"
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "root-c",
+    "children": [
+     "n-cempty"
+    ]
+   },
+   "n-cempty": {
+    "message": {
+     "id": "m-cempty",
+     "author": {
+      "role": "assistant"
+     },
+     "create_time": 1767225660,
+     "content": {
+      "content_type": "text",
+      "parts": [
+       "   "
+      ]
+     },
+     "recipient": "all"
+    },
+    "parent": "n-cu1",
+    "children": []
+   }
+  }
+ }
+]

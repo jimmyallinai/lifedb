@@ -1,0 +1,1 @@
+{"conversation":{"id":"thread_id","messages":"msgs","title":"name"},"conversations":"threads","format":"json","message":{"id":"mid","role":"sender","text":"body","time":"ts"},"platform":"samplechat","role_map":{"bot":"assistant","human":"user"}}

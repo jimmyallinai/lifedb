@@ -1,0 +1,84 @@
+"""<Platform> importer —— 复制本文件到 src/lifedb_importers/importers/<platform>_xxx.py 后逐段填。
+
+填写顺序（对照 templates/importer-template/README.md）：
+1. 改类名与类属性：name（CLI 名，小写连字符）、platform（记录里的平台标签）、
+display_name、entry_kind（file | qr | localdb | profile）、status、calibration。
+2. auth()：只负责"数据从哪来"。文件型 importer 校验 --source 路径即可；
+登录型走扫码 / profile 复用，会话只能经 core.vault 存本地 0700/0600。
+永远不收集账号密码、不发任何平台写请求。
+3. pull()：把原件落到 raw_dir，并如实报告 source_units（原件里的顶层单元数，
+如会话数）。网络拉取必须用 core.ratelimit 的随机间隔，遇 403 立即停手。
+4. normalize()：把原件解析成 core.schema.make_record(...) 统一记录，并做全量
+计数：每个看到的条目不是进 records 就是计入 items_skipped（空正文、无会话 id
+等），seen == kept + skipped，对账不过整轮失败——不许静默丢数据。
+5. message_id 优先用平台原生 id；确实没有时按 conv_id+序号+正文做 sha256
+派生（参考 importers/doubao_file.py 的 _message_id），保证重跑稳定、幂等。
+"""
+
+from __future__ import annotations
+
+import shutil
+from pathlib import Path
+
+from..core import schema
+from..core.base import Importer, NormalizeResult, PullResult
+
+
+def _load(path: Path):
+"""TODO: 解析原件，返回顶层单元列表（如会话列表）。格式写进本 importer 的 README。"""
+raise NotImplementedError
+
+
+class TemplateImporter(Importer):
+name = "template" # TODO: 改成 CLI 名，如 "someplatform-api"
+platform = "template" # TODO: 改成平台标签，如 "someplatform"
+display_name = "<平台名>（<入口一句话>）"
+entry_kind = "file" # TODO: file | qr | localdb | profile
+status = "beta"
+calibration = "TODO: 如实写这份解析器拿什么验过（真实导出样本 / 仅合成 fixture）"
+
+def auth(self, *, source: str | None = None, **kwargs) -> dict:
+# 文件型：校验来源文件。登录型：在这里触发扫码 / profile 解析，
+# 会话落 core.vault，不要在本文件里自己存明文 cookie。
+if not source:
+raise SystemExit(f"{self.name} needs --source <...>")
+path = Path(source).expanduser()
+if not path.is_file():
+raise SystemExit(f"source not found: {path}")
+return {"source_path": path}
+
+def pull(self, ctx: dict, raw_dir: Path, *, since: str | None = None) -> PullResult:
+raw_dir.mkdir(parents=True, exist_ok=True)
+source: Path = ctx["source_path"]
+target = raw_dir / source.name
+if source.resolve()!= target.resolve():
+shutil.copyfile(source, target)
+# 网络型 importer：不要 copyfile，改为按 --since 水位线增量拉取，
+# 每批请求之间用 core.ratelimit.sleep_random()，403 立即停并报错。
+return PullResult(raw_paths=[target], source_units=len(_load(target)))
+
+def normalize(self, pull: PullResult) -> NormalizeResult:
+records: list[dict] = []
+items_seen = items_skipped = 0
+units = _load(pull.raw_paths[0])
+for unit in units:
+# TODO: 从 unit 取会话 id / 标题 / 消息列表；无会话 id 的单元，
+# 其消息全部计 seen + skipped（参考 importers/generic_file.py）。
+for message in unit_messages(unit): # noqa: F821 # TODO: 换成真实取法
+items_seen += 1
+text = message_text(message) # noqa: F821 # TODO: 换成真实取法
+if not text:
+items_skipped += 1
+continue
+records.append(schema.make_record(
+platform=self.platform,
+source=self.name,
+conversation_id=unit_id(unit), # noqa: F821 # TODO
+conversation_title=unit_title(unit), # noqa: F821 # TODO
+message_id=message_native_id(message), # noqa: F821 # TODO
+role=message_role(message), # noqa: F821 # TODO
+text=text,
+created_at=message_time(message), # noqa: F821 # TODO；epoch/ISO 均可，schema 会归一
+))
+return NormalizeResult(records=records, units_seen=len(units),
+items_seen=items_seen, items_skipped=items_skipped)

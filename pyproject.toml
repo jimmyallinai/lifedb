@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lifedb-importers"
+version = "0.1.0"
+description = "把散在各平台的人生数据用数据层直取拿回本地，变成统一的本地 JSONL 记忆格式。Local-first, read-only importers for your own platform data."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "jimmyallinai" }]
+keywords = ["personal-data", "memory", "importer", "local-first", "agent"]
+dependencies = []
+
+[project.scripts]
+lifedb-import = "lifedb_importers.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
